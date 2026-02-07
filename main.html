@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Anniversary</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <div id="petals-container"></div>
+    <a href="magic.html" class="magic-btn"> ✨ Magic Mode </a>
+    <h2
+      style="
+        text-align: center;
+        margin-top: 30px;
+        font-family: &quot;Dancing Script&quot;, cursive;
+        font-size: 3rem;
+        color: #800000;
+      "
+    >
+      Happy Anniversary
+    </h2>
+
+    <div class="single-photo-container">
+      <img
+        src="assets/images/foto1.png"
+        alt="Foto Anniversary"
+        class="hero-photo"
+      />
+    </div>
+
+    <div class="timer-container">
+      <h3 class="timer-title">Sudah Bersama Selama:</h3>
+      <div id="countdown">
+        <div class="time-box">
+          <span id="days">00</span><span class="label">Hari</span>
+        </div>
+        <div class="time-box">
+          <span id="hours">00</span><span class="label">Jam</span>
+        </div>
+        <div class="time-box">
+          <span id="minutes">00</span><span class="label">Menit</span>
+        </div>
+        <div class="time-box">
+          <span id="seconds">00</span><span class="label">Detik</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="adaptive-section">
+      <div class="carousel-container">
+        <img
+          src="assets/images/red.png"
+          class="active-slide"
+          alt="Red Theme"
+          data-color="#ff0000"
+        />
+
+        <img src="assets/images/bw.png" alt="BW Theme" data-color="#cccccc" />
+
+        <img
+          src="assets/images/biru.png"
+          alt="Blue Theme"
+          data-color="#0000ff"
+        />
+
+        <img
+          src="assets/images/cream.png"
+          alt="Cream Theme"
+          data-color="#FFD700"
+        />
+
+        <img
+          src="assets/images/purple.png"
+          alt="Dark Theme"
+          data-color="#800080"
+        />
+
+        <button class="nav-btn prev-btn">&#10094;</button>
+        <button class="nav-btn next-btn">&#10095;</button>
+      </div>
+
+      <div class="adaptive-caption">
+        <h3>Our Journey Together</h3>
+      </div>
+    </div>
+    <script src="js/script.js"></script>
+  </body>
+  <div class="music-widget">
+    <div class="music-card" id="musicCard">
+      <div class="song-info">
+        <h4 id="songTitle">Judul Lagu</h4>
+        <p id="artistName">Nama Artis</p>
+      </div>
+
+      <div class="music-controls">
+        <button id="prevTrack" title="Previous">⏮</button>
+        <button id="playPauseBtn" title="Play/Pause">▶</button>
+        <button id="nextTrack" title="Next">⏭</button>
+      </div>
+
+      <audio id="audioPlayer"></audio>
+    </div>
+
+    <button class="music-toggle-btn" id="musicToggle">🎵</button>
+  </div>
+  <div
+    style="text-align: center; margin: 40px 0; position: relative; z-index: 10"
+  >
+    <button id="open-letter-btn" onclick="openLetter()">
+      💌 Baca Surat Untukmu
+    </button>
+  </div>
+
+  <div id="letter-modal" class="modal-overlay">
+    <div class="letter-content">
+      <span class="close-btn" onclick="closeLetter()">&times;</span>
+
+      <h2 class="letter-header">My Dear...</h2>
+      <div class="typewriter-container">
+        <p id="typewriter-text"></p>
+        <span id="cursor">|</span>
+      </div>
+      <p class="letter-footer">With love, BIBIB</p>
+    </div>
+  </div>
+</html>

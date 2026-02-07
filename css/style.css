@@ -1,0 +1,622 @@
+/* =========================================
+   1. SETUP DASAR & WARNA
+   ========================================= */
+/* Import Font Tulisan Tangan yang Cantik */
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap");
+:root {
+  --deep-walnut: #3e2723;
+  --maroon: #800000;
+  --parchment: #e3dac9;
+  --soft-gold: #c2b280;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--deep-walnut);
+  color: var(--parchment);
+  font-family: "Playfair Display", serif;
+  line-height: 1.8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  min-height: 100vh;
+}
+
+/* =========================================
+   2. TYPOGRAPHY (HURUF)
+   ========================================= */
+.main-title {
+  text-align: center;
+  margin-top: 30px;
+  font-family: "Dancing Script", cursive;
+  font-size: 3rem;
+  color: var(--maroon);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+h1,
+h2 {
+  text-align: center;
+}
+
+h1 {
+  font-family: "Dancing Script", cursive;
+  color: var(--maroon);
+  font-size: 4rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+h2 {
+  font-family: "Playfair Display", serif;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  color: var(--soft-gold);
+  margin-bottom: 30px;
+}
+
+p {
+  max-width: 600px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+/* =========================================
+   3. FOTO UTAMA (SINGLE PHOTO)
+   ========================================= */
+.single-photo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px 0;
+  width: 100%;
+}
+
+.hero-photo {
+  width: 80%;
+  max-width: 600px;
+  height: auto;
+  border-radius: 15px;
+  transition:
+    transform 0.4s ease,
+    filter 0.4s ease;
+  cursor: pointer;
+}
+
+.hero-photo:hover {
+  transform: scale(1.02) translateY(-10px);
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6));
+}
+
+/* =========================================
+   4. COUNTDOWN TIMER
+   ========================================= */
+.timer-container {
+  text-align: center;
+  margin: 40px 0;
+  font-family: "Playfair Display", serif;
+}
+
+.timer-title {
+  color: var(--parchment);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+  font-style: italic;
+}
+
+#countdown {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.time-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--soft-gold);
+  padding: 15px;
+  border-radius: 8px;
+  min-width: 80px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.time-box span:first-child {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--soft-gold);
+  line-height: 1;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--parchment);
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* =========================================
+   5. CAROUSEL & GLOW PER FOTO (LENGKAP)
+   ========================================= */
+.adaptive-section {
+  position: relative;
+  width: 100vw;
+  margin-left: -20px;
+  margin-right: -20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--deep-walnut);
+  padding: 40px 20px;
+}
+
+.carousel-container {
+  position: relative;
+  width: 80%;
+  max-width: 900px;
+  aspect-ratio: 16 / 9;
+  border-radius: 15px;
+  background: #000;
+  margin: 0 auto;
+
+  /* Default Glow Color (Emas) - Akan diupdate oleh JavaScript */
+  --glow-color: #ffd700;
+
+  /* Shadow Awal (Redup) */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+  z-index: 10;
+}
+
+/* EFEK SAAT MOUSE DIATAS FOTO (HOVER) */
+.carousel-container:hover {
+  transform: scale(1.02);
+
+  /* GLOW MENGGUNAKAN VARIABEL YANG DIATUR JS */
+  box-shadow:
+    0 0 20px var(--glow-color),
+    0 0 60px var(--glow-color);
+}
+
+.carousel-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  border-radius: 15px;
+}
+
+.carousel-container img.active-slide {
+  opacity: 1;
+}
+
+/* TOMBOL NAVIGASI */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 5px;
+}
+
+.nav-btn:hover {
+  /* Tombol ikut berubah warna sesuai glow foto */
+  background: var(--glow-color);
+  color: #3e2723;
+  box-shadow: 0 0 15px var(--glow-color);
+}
+
+.prev-btn {
+  left: -25px;
+}
+.next-btn {
+  right: -25px;
+}
+
+/* Responsif untuk HP */
+@media screen and (max-width: 768px) {
+  .prev-btn {
+    left: 10px;
+  }
+  .next-btn {
+    right: 10px;
+  }
+  .carousel-container:hover {
+    transform: none;
+  }
+}
+
+.adaptive-caption {
+  margin-top: 40px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  z-index: 5;
+  font-family: "Dancing Script", cursive;
+  font-size: 2.5rem;
+  text-align: center;
+}
+/* =========================================
+   6. FLOATING MUSIC PLAYER
+   ========================================= */
+.music-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000; /* Paling atas */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+/* Tombol Bulat (Toggle) */
+.music-toggle-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--soft-gold);
+  border: 2px solid #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.3s ease,
+    background 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 3px;
+}
+
+.music-toggle-btn:hover {
+  transform: scale(1.1) rotate(10deg);
+  background-color: #fff;
+}
+
+/* Kartu Player (Awalnya Tersembunyi) */
+.music-card {
+  background: rgba(62, 39, 35, 0.95); /* Deep Walnut Transparan */
+  backdrop-filter: blur(10px);
+  padding: 15px 20px;
+  border-radius: 15px;
+  border: 1px solid var(--soft-gold);
+  width: 250px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+  /* Animasi muncul */
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none; /* Agar tidak bisa diklik saat sembunyi */
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Class untuk memunculkan player */
+.music-card.show-player {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+/* Info Lagu */
+.song-info {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.song-info h4 {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  color: var(--soft-gold);
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #ccc;
+}
+
+/* Kontrol Tombol (Prev, Play, Next) */
+.music-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.music-controls button {
+  background: none;
+  border: 1px solid var(--soft-gold);
+  color: var(--soft-gold);
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-controls button:hover {
+  background: var(--soft-gold);
+  color: var(--deep-walnut);
+}
+
+/* Tombol Play lebih besar sedikit */
+#playPauseBtn {
+  width: 40px;
+  height: 40px;
+  font-size: 1rem;
+  border: 2px solid var(--soft-gold);
+}
+
+/* Animasi Putar saat lagu main (Opsional untuk icon toggle) */
+.playing-spin {
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* =========================================
+   7. MAGIC MODE BUTTON
+   ========================================= */
+/* =========================================
+   7. MAGIC MODE BUTTON (REVISI POSISI)
+   ========================================= */
+.magic-btn {
+  position: fixed;
+
+  /* --- UBAH POSISI KE KIRI BAWAH --- */
+  top: auto; /* Reset posisi atas */
+  right: auto; /* Reset posisi kanan */
+  bottom: 30px; /* Jarak dari bawah */
+  left: 30px; /* Jarak dari kiri */
+
+  z-index: 2000;
+
+  /* Desain Dasar */
+  background: rgba(62, 39, 35, 0.8); /* Cokelat Transparan */
+  color: var(--soft-gold);
+  border: 1px solid var(--soft-gold);
+
+  font-family: "Playfair Display", serif;
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-decoration: none;
+
+  padding: 12px 25px;
+  border-radius: 50px;
+  backdrop-filter: blur(5px);
+
+  /* PENTING: Agar teks tidak turun baris */
+  white-space: nowrap;
+
+  /* Transisi & Animasi */
+  transition: all 0.4s ease;
+  animation: pulse-gold 3s infinite; /* Animasi diperlambat biar elegan */
+
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Efek saat Mouse Diarahkan (Hover) */
+.magic-btn:hover {
+  background: var(--soft-gold);
+  color: var(--deep-walnut);
+  transform: translateY(-5px); /* Naik sedikit */
+  box-shadow:
+    0 0 20px var(--soft-gold),
+    0 0 40px rgba(194, 178, 128, 0.6);
+  border-color: transparent;
+  animation: none;
+}
+
+/* Responsif HP: Sesuaikan ukuran & posisi */
+@media screen and (max-width: 768px) {
+  .magic-btn {
+    bottom: 90px; /* Naik sedikit di HP agar tidak menabrak Music Player */
+    left: 20px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+#petals-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Agar kelopak yang lewat bawah layar hilang */
+  z-index: -1; /* PENTING: Taruh di belakang konten utama */
+  pointer-events: none; /* Agar tidak menghalangi klik mouse pada tombol/carousel */
+}
+
+/* Gaya dasar satu kelopak */
+/* Gaya dasar satu kelopak */
+.petal {
+  position: absolute;
+  top: -10vh; /* Mulai dari atas layar */
+
+  /* --- PERBAIKAN UKURAN --- */
+  width: 40px; /* Atur ukuran dasar kelopak menjadi kecil */
+  height: auto; /* Jaga proporsi gambar */
+  /* ------------------------ */
+
+  opacity: 0; /* Awalnya tidak terlihat */
+  will-change: transform; /* Optimasi performa */
+}
+/* Definisi Animasi Jatuh & Bergoyang */
+@keyframes fall-sway {
+  0% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9; /* Muncul perlahan */
+  }
+  100% {
+    /* Jatuh sampai bawah (110vh), berputar, dan bergeser ke samping */
+    transform: translateY(110vh) rotate(360deg) translateX(50px);
+    opacity: 0.5; /* Memudar saat sampai bawah */
+  }
+}
+/* =========================================
+   9. SURAT CINTA (POP-UP / MODAL STYLE)
+   ========================================= */
+
+/* Tombol Buka Surat */
+#open-letter-btn {
+  background: transparent;
+  border: 2px solid var(--soft-gold);
+  color: var(--soft-gold);
+  padding: 12px 35px;
+  font-family: "Playfair Display", serif;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-radius: 50px;
+  transition: 0.3s;
+  backdrop-filter: blur(5px);
+}
+
+#open-letter-btn:hover {
+  background: var(--soft-gold);
+  color: var(--deep-walnut);
+  box-shadow: 0 0 20px rgba(194, 178, 128, 0.4);
+  transform: translateY(-3px);
+}
+
+/* Latar Belakang Gelap (Overlay) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85); /* Gelap banget biar fokus */
+  z-index: 3000; /* Paling atas */
+  display: none; /* Sembunyi dulu */
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+/* Kertas Suratnya */
+.letter-content {
+  background: #fffbf0; /* Warna kertas krem/vintage */
+  color: #3e2723; /* Teks cokelat tua */
+  width: 90%;
+  max-width: 500px;
+  padding: 40px 30px;
+  border-radius: 5px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+  position: relative;
+  text-align: left;
+
+  /* Efek Kertas Kusut (Optional border) */
+  border: 10px solid transparent;
+  border-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png")
+    30 round;
+
+  /* Animasi Pop Up */
+  transform: scale(0.7);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Class saat aktif (dikasih JS nanti) */
+.modal-overlay.active {
+  display: flex;
+}
+.modal-overlay.active .letter-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Tombol Close (X) */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #888;
+  transition: 0.3s;
+}
+.close-btn:hover {
+  color: #d32f2f;
+}
+
+/* Teks Surat */
+.letter-header {
+  font-family: "Playfair Display", serif;
+  text-align: center;
+  margin-top: 0;
+  color: #5d4037;
+}
+
+#typewriter-text {
+  font-family:
+    "Dancing Script", cursive; /* Pastikan font ini sudah di-import */
+  font-size: 1.4rem;
+  line-height: 1.6;
+  margin-top: 20px;
+  min-height: 150px;
+  white-space: pre-wrap;
+}
+
+.letter-footer {
+  text-align: right;
+  font-family: "Dancing Script", cursive;
+  margin-top: 20px;
+  font-weight: bold;
+  color: #5d4037;
+}
+
+/* Kursor Kedip */
+#cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2rem;
+  background-color: #5d4037;
+  animation: blink 1s infinite;
+}

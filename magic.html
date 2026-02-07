@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Magic Gestures: Small Love</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #050505;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      /* LAYERING */
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1 !important;
+      }
+      #webcam {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        width: 160px;
+        height: 120px;
+        transform: scaleX(-1);
+        opacity: 0.5;
+        border-radius: 10px;
+        z-index: 2 !important;
+        pointer-events: none;
+      }
+
+      /* UI PANEL */
+      #ui-container {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 100 !important;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        width: 280px;
+      }
+
+      /* START OVERLAY */
+      #start-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 2147483647 !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+      }
+
+      #start-btn {
+        position: relative;
+        z-index: 2147483647 !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        padding: 15px 50px;
+        font-size: 1.5rem;
+        background: #ff0055;
+        color: white;
+        border: 2px solid white;
+        border-radius: 50px;
+        margin-top: 30px;
+        font-weight: bold;
+        transition: 0.2s;
+        box-shadow: 0 0 30px rgba(255, 0, 85, 0.5);
+        letter-spacing: 2px;
+      }
+      #start-btn:hover {
+        transform: scale(1.05);
+        background: white;
+        color: #ff0055;
+      }
+
+      /* GUIDES */
+      .guide-item {
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+      }
+      .guide-icon {
+        width: 35px;
+        text-align: center;
+        margin-right: 10px;
+        font-size: 1.4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="start-overlay">
+      <h1 style="margin-bottom: 10px">🤟 Magic Gestures</h1>
+      <p style="opacity: 0.8; max-width: 500px; line-height: 1.6">
+        Gunakan gerakan tanganmu:<br />
+        🤘 <b>Rock</b> = Bentuk Love<br />
+        🤟 <b>ILY</b> = Tulisan "I Love You"<br />
+        ✊ <b>Kepal</b> = Planet Saturnus<br />
+        ✌️ <b>Peace</b> = Huruf M
+      </p>
+      <button id="start-btn" onclick="startApp()">MULAI KAMERA</button>
+    </div>
+
+    <div id="ui-container">
+      <h3
+        style="
+          margin-top: 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+          padding-bottom: 10px;
+        "
+      >
+        Gesture Guide
+      </h3>
+      <div class="guide-item">
+        <span class="guide-icon">🤘</span> <span>Rock = Love</span>
+      </div>
+      <div class="guide-item">
+        <span class="guide-icon">🤟</span> <span>ILY = Teks I ❤️ U</span>
+      </div>
+      <div class="guide-item">
+        <span class="guide-icon">✊</span> <span>Kepal = Saturnus</span>
+      </div>
+      <div class="guide-item">
+        <span class="guide-icon">✌️</span> <span>Peace = Huruf M</span>
+      </div>
+
+      <div
+        style="
+          margin-top: 20px;
+          padding-top: 10px;
+          border-top: 1px solid rgba(255, 255, 255, 0.3);
+        "
+      >
+        <div style="font-size: 0.8rem; opacity: 0.7">Status Terdeteksi:</div>
+        <div
+          id="status"
+          style="
+            color: #00d2ff;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 5px;
+          "
+        >
+          Menunggu...
+        </div>
+      </div>
+    </div>
+
+    <video id="webcam" playsinline></video>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+
+    <script>
+      // --- 1. SETUP THREE.JS ---
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x050505, 0.002);
+
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      camera.position.z = 40;
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // --- 2. TEXTURE BULAT ---
+      function createCircleTexture() {
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.arc(16, 16, 14, 0, Math.PI * 2);
+        ctx.fillStyle = "white";
+        ctx.fill();
+        return new THREE.CanvasTexture(canvas);
+      }
+
+      // --- 3. PARTIKEL ---
+      const count = 40000;
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(count * 3);
+      const target = new Float32Array(count * 3);
+
+      // Posisi awal: BOLA
+      for (let i = 0; i < count; i++) {
+        const u = Math.random(),
+          v = Math.random();
+        const theta = 2 * Math.PI * u,
+          phi = Math.acos(2 * v - 1),
+          r = 12 + Math.random();
+        const x = r * Math.sin(phi) * Math.cos(theta);
+        const y = r * Math.sin(phi) * Math.sin(theta);
+        const z = r * Math.cos(phi);
+
+        pos[i * 3] = x;
+        pos[i * 3 + 1] = y;
+        pos[i * 3 + 2] = z;
+        target[i * 3] = x;
+        target[i * 3 + 1] = y;
+        target[i * 3 + 2] = z;
+      }
+
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+
+      const mat = new THREE.PointsMaterial({
+        size: 0.2,
+        color: 0xff0055,
+        map: createCircleTexture(),
+        alphaTest: 0.5,
+        transparent: true,
+        opacity: 0.8,
+        blending: THREE.AdditiveBlending,
+      });
+
+      const particles = new THREE.Points(geo, mat);
+      scene.add(particles);
+
+      // --- 4. RUMUS BENTUK ---
+
+      // A. LOVE (KECIL & PADAT) - UPDATE DI SINI
+      function getLovePoint() {
+        const t = Math.random() * Math.PI * 2;
+
+        // SAYA UBAH SKALA DARI 1.5 JADI 0.6 AGAR KECIL
+        const scale = 0.6 * Math.pow(Math.random(), 1 / 3);
+
+        let x = 16 * Math.pow(Math.sin(t), 3);
+        let y =
+          13 * Math.cos(t) -
+          5 * Math.cos(2 * t) -
+          2 * Math.cos(3 * t) -
+          Math.cos(4 * t);
+
+        // Ketebalan juga dikurangi biar tidak lonjong (dari 10 jadi 4)
+        let z = (Math.random() - 0.5) * 4;
+
+        return {
+          x: x * scale,
+          y: y * scale + 2,
+          z: z * scale,
+        };
+      }
+
+      // B. TEKS "I ❤️ U"
+      function getILoveYouPoint() {
+        const part = Math.random();
+        let x, y, z;
+        const jitter = 0.5;
+
+        if (part < 0.2) {
+          // HURUF "I"
+          x = -15 + (Math.random() - 0.5) * 2;
+          y = Math.random() * 16 - 6;
+          z = (Math.random() - 0.5) * 2;
+        } else if (part < 0.6) {
+          // HURUF "❤️"
+          const t = Math.random() * Math.PI * 2;
+          const scale = 0.6 * Math.sqrt(Math.random());
+          let hx = 16 * Math.pow(Math.sin(t), 3);
+          let hy =
+            13 * Math.cos(t) -
+            5 * Math.cos(2 * t) -
+            2 * Math.cos(3 * t) -
+            Math.cos(4 * t);
+
+          x = hx * scale;
+          y = hy * scale;
+          z = (Math.random() - 0.5) * 2;
+        } else {
+          // HURUF "U"
+          const t = Math.random();
+          const angle = Math.PI * t;
+
+          if (Math.random() > 0.4) {
+            x = 15 + 4 * Math.cos(angle + Math.PI);
+            y = -2 + 4 * Math.sin(angle + Math.PI);
+          } else {
+            const side = Math.random() > 0.5 ? 1 : -1;
+            x = 15 + side * 4;
+            y = Math.random() * 8 - 2;
+          }
+          x += (Math.random() - 0.5) * jitter;
+          z = (Math.random() - 0.5) * 2;
+        }
+        return { x, y, z };
+      }
+
+      // C. HURUF M
+      function getMPoint() {
+        const segment = Math.random();
+        let x, y, z;
+        const width = 1.5;
+        if (segment < 0.25) {
+          x = -10 + (Math.random() - 0.5) * width;
+          y = Math.random() * 20 - 10;
+        } else if (segment < 0.5) {
+          const t = Math.random();
+          x = -10 + 10 * t;
+          y = 10 - 10 * t;
+        } else if (segment < 0.75) {
+          const t = Math.random();
+          x = 0 + 10 * t;
+          y = 0 + 10 * t;
+        } else {
+          x = 10 + (Math.random() - 0.5) * width;
+          y = Math.random() * 20 - 10;
+        }
+        z = (Math.random() - 0.5) * 4;
+        return { x, y, z };
+      }
+
+      // D. SATURNUS
+      function getSaturnPoint() {
+        const rand = Math.random();
+        let x, y, z;
+        if (rand < 0.6) {
+          const u = Math.random(),
+            v = Math.random();
+          const theta = 2 * Math.PI * u,
+            phi = Math.acos(2 * v - 1),
+            r = 9;
+          x = r * Math.sin(phi) * Math.cos(theta);
+          y = r * Math.sin(phi) * Math.sin(theta);
+          z = r * Math.cos(phi);
+        } else {
+          const theta = Math.random() * Math.PI * 2;
+          const r = 14 + Math.random() * 8;
+          x = r * Math.cos(theta);
+          z = r * Math.sin(theta);
+          y = (Math.random() - 0.5) * 0.5;
+          const tilt = Math.PI / 6;
+          const yNew = y * Math.cos(tilt) - z * Math.sin(tilt);
+          const zNew = y * Math.sin(tilt) + z * Math.cos(tilt);
+          y = yNew;
+          z = zNew;
+        }
+        return { x, y, z };
+      }
+
+      // E. BOLA (Default)
+      function getSpherePoint() {
+        const u = Math.random(),
+          v = Math.random();
+        const theta = 2 * Math.PI * u,
+          phi = Math.acos(2 * v - 1),
+          r = 12 + Math.random();
+        return {
+          x: r * Math.sin(phi) * Math.cos(theta),
+          y: r * Math.sin(phi) * Math.sin(theta),
+          z: r * Math.cos(phi),
+        };
+      }
+
+      // --- 5. GANTI BENTUK ---
+      let currentShape = "sphere";
+
+      function setShape(type) {
+        if (currentShape === type) return;
+        currentShape = type;
+
+        // Warna Custom
+        if (type === "saturn")
+          mat.color.setHex(0xffd700); // Emas
+        else if (type === "love")
+          mat.color.setHex(0xff0055); // Merah Pink
+        else if (type === "m")
+          mat.color.setHex(0x00ffff); // Cyan
+        else if (type === "ily")
+          mat.color.setHex(0xff69b4); // Hot Pink
+        else mat.color.setHex(0xffffff); // Putih
+
+        for (let i = 0; i < count; i++) {
+          let p;
+          if (type === "saturn") p = getSaturnPoint();
+          else if (type === "love") p = getLovePoint();
+          else if (type === "m") p = getMPoint();
+          else if (type === "ily") p = getILoveYouPoint();
+          else p = getSpherePoint();
+
+          target[i * 3] = p.x;
+          target[i * 3 + 1] = p.y;
+          target[i * 3 + 2] = p.z;
+        }
+      }
+
+      // --- 6. ANIMASI ---
+      function animate() {
+        requestAnimationFrame(animate);
+        const p = particles.geometry.attributes.position.array;
+        for (let i = 0; i < count; i++) {
+          const ix = i * 3,
+            iy = i * 3 + 1,
+            iz = i * 3 + 2;
+          p[ix] += (target[ix] - p[ix]) * 0.08;
+          p[iy] += (target[iy] - p[iy]) * 0.08;
+          p[iz] += (target[iz] - p[iz]) * 0.08;
+        }
+        particles.geometry.attributes.position.needsUpdate = true;
+        particles.rotation.y += 0.002;
+
+        // Efek Detak Jantung di mode Love
+        if (currentShape === "love" || currentShape === "ily") {
+          const scale = 1 + Math.sin(Date.now() * 0.005) * 0.03;
+          particles.scale.set(scale, scale, scale);
+        } else {
+          particles.scale.set(1, 1, 1);
+        }
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // --- 7. DETEKSI GESTURE ---
+      const hands = new Hands({
+        locateFile: (file) =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.6,
+        minTrackingConfidence: 0.6,
+      });
+
+      const statusEl = document.getElementById("status");
+
+      hands.onResults((results) => {
+        document.getElementById("start-overlay").style.display = "none";
+
+        if (
+          results.multiHandLandmarks &&
+          results.multiHandLandmarks.length > 0
+        ) {
+          const lm = results.multiHandLandmarks[0];
+          const isFingerDown = (tip, pip) => lm[tip].y > lm[pip].y;
+
+          // Cek status jari (Tip vs PIP/MCP)
+          const indexUp = !isFingerDown(8, 6);
+          const middleUp = !isFingerDown(12, 10);
+          const ringUp = !isFingerDown(16, 14);
+          const pinkyUp = !isFingerDown(20, 18);
+
+          const thumbTip = lm[4];
+          const pinkyBase = lm[17];
+          const thumbDist = Math.sqrt(
+            (thumbTip.x - pinkyBase.x) ** 2 + (thumbTip.y - pinkyBase.y) ** 2,
+          );
+          const thumbOut = thumbDist > 0.3;
+
+          // --- LOGIKA UTAMA ---
+
+          // 1. KEPAL (Semua jari turun) -> SATURNUS
+          if (!indexUp && !middleUp && !ringUp && !pinkyUp) {
+            statusEl.innerText = "✊ Kepal (Saturnus)";
+            setShape("saturn");
+          }
+          // 2. PEACE (Telunjuk & Tengah Naik) -> HURUF M
+          else if (indexUp && middleUp && !ringUp && !pinkyUp) {
+            statusEl.innerText = "✌️ Peace (Huruf M)";
+            setShape("m");
+          }
+          // 3. I LOVE YOU / SPIDER-MAN (Jempol, Telunjuk, Kelingking Naik) -> TEKS ILY
+          else if (thumbOut && indexUp && !middleUp && !ringUp && pinkyUp) {
+            statusEl.innerText = "🤟 ILY (Teks I Love You)";
+            setShape("ily");
+          }
+          // 4. ROCK / METAL (Telunjuk & Kelingking Naik, Jempol Masuk) -> LOVE KECIL
+          else if (!thumbOut && indexUp && !middleUp && !ringUp && pinkyUp) {
+            statusEl.innerText = "🤘 Rock (Love)";
+            setShape("love");
+          }
+          // Default -> BOLA
+          else {
+            statusEl.innerText = "✋ Netral (Bola)";
+            setShape("sphere");
+          }
+        } else {
+          statusEl.innerText = "Tangan Tidak Terdeteksi";
+          setShape("sphere");
+        }
+      });
+
+      // --- 8. START APP ---
+      window.startApp = function () {
+        const btn = document.getElementById("start-btn");
+        btn.innerText = "MEMUAT...";
+        btn.style.cursor = "wait";
+
+        const vid = document.getElementById("webcam");
+        const cameraObj = new Camera(vid, {
+          onFrame: async () => {
+            await hands.send({ image: vid });
+          },
+          width: 640,
+          height: 480,
+        });
+
+        cameraObj
+          .start()
+          .then(() => console.log("Camera Started"))
+          .catch((err) => alert("Gagal akses kamera: " + err));
+      };
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>
